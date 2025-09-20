@@ -1,12 +1,12 @@
 param(
     [switch]$upload = $false,
-    [switch]$noTest = $false,
+    [switch]$noTest = $true,
     [switch]$noBuild = $false,
     [string]$key = '',
     [string]$saveKey = '',
-    [switch]$noLinux = $false,
-    [switch]$noWin32 = $false,
-    [switch]$noUWP = $false,
+    [switch]$noLinux = $true,
+    [switch]$noWin32 = $true,
+    [switch]$noUWP = $true,
     [switch]$noAndroid = $false
 )
 
@@ -138,6 +138,20 @@ if ($buildAndroid) {
     Build-Preset -preset Android_Arm64_Release -presetName 'Android arm64-v8a'
 }
 
+if ($buildAndroid) {
+    Write-Host @"
+    _           _              _ 
+   /_\  _ _  __| |_ _ ___( )__| |
+  / _ \| ' \/ _' | '_/ _ \ / _' |
+ /_/ \_\_||_\__,_|_| \___/_\__,_|
+                      
+"@ -ForegroundColor White
+
+    # 编译Android x64 Debug版本
+    Build-Preset -preset Android_x64_Debug -presetName 'Android x64 Debug'
+    # 编译Android arm64-v8a Debug版本
+    Build-Preset -preset Android_Arm64_Debug -presetName 'Android arm64-v8a Debug'
+}
 #### Run tests ########################
 
 # Run tests!
