@@ -106,11 +106,6 @@ jobs:
         path: |
           .deps_cache
 
-    # UWP ARM32 builds no longer work in Windows SDK 26100 and onwards, so we
-    # need to explicitly use 22621, the last version that supported it.
-    - name: Install Windows 10 SDK 10.0.22621.0 (all components)
-      run: choco install windows-sdk-11-version-22h2-all --yes --no-progress
-
     - name: Set Version
       shell: pwsh
       run: ./tools/Set-Version.ps1 -major ${{inputs.major}} -minor ${{inputs.minor}} -patch ${{inputs.patch}} -pre ${{inputs.pre}} -preName ${{inputs.preName}}
@@ -123,24 +118,18 @@ jobs:
       run: |
         cmake --preset Win32_Arm64_Release
         cmake --build --preset Win32_Arm64_Release
-    - name: Build Native UWP x64
-      run: |
-        cmake --preset Uwp_x64_Release
-        cmake --build --preset Uwp_x64_Release
-    - name: Build Native UWP ARM64
-      run: |
-        cmake --preset Uwp_Arm64_Release
-        cmake --build --preset Uwp_Arm64_Release
-    - name: Build Native UWP ARM32
-      run: |
-        cmake --preset Uwp_Arm32_Release
-        cmake --build --preset Uwp_Arm32_Release
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: binaries-windows
         path: bin/distribute/
+
+    - name: Upload Tools
+      uses: actions/upload-artifact@v4
+      with:
+        name: tools-windows
+        path: bin/tools/
 
 ###########################################
 
@@ -182,7 +171,7 @@ jobs:
     - name: Install Prerequisites
       run: |
         sudo apt-get update
-        sudo apt-get install clang lld ninja-build libx11-dev libxfixes-dev libegl-dev libgbm-dev libfontconfig-dev
+        sudo apt-get install clang llvm lld ninja-build libx11-dev libxfixes-dev libfontconfig-dev
     
     - name: Set Version
       shell: pwsh
@@ -228,8 +217,8 @@ jobs:
     - name: Upload Tools
       uses: actions/upload-artifact@v4
       with:
-        name: tools
-        path: tools/skshaderc/
+        name: tools-linux
+        path: bin/tools/
 
   ###########################################
 
@@ -256,8 +245,9 @@ jobs:
     - name: Get Tools from Previous
       uses: actions/download-artifact@v4
       with:
-        name: tools
-        path: tools/skshaderc/
+        merge-multiple: true
+        pattern: tools-*
+        path: bin/tools/
 
     - name: Set Version
       shell: pwsh
